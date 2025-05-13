@@ -23,9 +23,10 @@
 //
 
 #include "pub_handler.h"
-
+#include <rclcpp/rclcpp.hpp>
 #include <cstdlib>
 #include <chrono>
+#include <string>
 #include <iostream>
 #include <limits>
 
@@ -102,6 +103,7 @@ void PubHandler::OnLivoxLidarPointCloudCallback(uint32_t handle, const uint8_t d
     return;
   }
 
+  RCLCPP_INFO(rclcpp::get_logger("LIVOX DEBUG"), std::to_string(data->time_type).c_str() );
   if (data->time_type != kTimestampTypeNoSync) {
     is_timestamp_sync_.store(true);
   } else {
