@@ -33,6 +33,7 @@
 namespace livox_ros {
 
 std::atomic<bool> PubHandler::is_timestamp_sync_;
+std::atomic<int> PubHandler::timesync_state_;
 
 PubHandler &pub_handler() {
   static PubHandler handler;
@@ -103,7 +104,11 @@ void PubHandler::OnLivoxLidarPointCloudCallback(uint32_t handle, const uint8_t d
     return;
   }
 
-  RCLCPP_INFO(rclcpp::get_logger("LIVOX DEBUG"), std::to_string(data->time_type).c_str() );
+  if (data->time_type != timesync_state_.load()) {
+    timesync_state_.store(data->time_type);
+    RCLCPP_INFO(rclcpp::get_logger("LIVOX TIMESYNC"), ("PTP time_sync: " + std::to_string(data->time_type)).c_str() );
+  } 
+  
   if (data->time_type != kTimestampTypeNoSync) {
     is_timestamp_sync_.store(true);
   } else {
